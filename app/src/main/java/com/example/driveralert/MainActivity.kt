@@ -182,6 +182,7 @@ private fun CameraPreview(
     var earValue by rememberSaveable { mutableStateOf(0.0) }
     var headPoseDescription by rememberSaveable { mutableStateOf("") }
     var faceDetected by rememberSaveable { mutableStateOf(false) }
+    var detectedFace by rememberSaveable { mutableStateOf<com.google.mlkit.vision.face.Face?>(null) }
     
     val fatigueDetector = remember(context) {
         FatigueDetector(context) { level ->
@@ -221,6 +222,7 @@ private fun CameraPreview(
                             .addOnSuccessListener { faces ->
                                 if (faces.isNotEmpty()) {
                                     val face = faces[0]
+                                    detectedFace = face
                                     val result = FaceDetectionResult(
                                         face = face,
                                         leftEye = face.getLandmark(com.google.mlkit.vision.face.FaceLandmark.LEFT_EYE),
@@ -262,6 +264,7 @@ private fun CameraPreview(
                                     }
                                 } else {
                                     faceDetected = false
+                                    detectedFace = null
                                     fatigueLevel = FatigueLevel.NONE
                                     earValue = 0.0
                                     headPoseDescription = "Aucun visage détecté"
@@ -310,6 +313,7 @@ private fun CameraPreview(
                 cameraProviderFuture.get().unbindAll()
             }, androidx.core.content.ContextCompat.getMainExecutor(context))
             executor.shutdown()
+            fatigueDetector.release()
         }
     }
 

@@ -22,25 +22,25 @@ object HeadPoseEstimator {
             return false
         }
         
-        // Seuils pour détecter une inclinaison significative
-        val pitchThreshold = 20.0f // Degrés
-        val rollThreshold = 15.0f  // Degrés
-        val yawThreshold = 30.0f   // Degrés
+        // Seuils pour détecter une inclinaison significative (augmentés pour être moins sensibles)
+        val pitchThreshold = 25.0f // Degrés - tête qui tombe vers l'avant
+        val rollThreshold = 25.0f  // Degrés - inclinaison latérale (augmenté)
+        val yawThreshold = 45.0f   // Degrés - rotation (augmenté, car tourner la tête est normal)
         
         val pitch = eulerX ?: 0f
         val roll = eulerZ ?: 0f
         val yaw = eulerY ?: 0f
         
-        // Tête qui tombe vers l'avant (pitch positif) = signe de fatigue
-        val headFallingForward = kotlin.math.abs(pitch) > pitchThreshold && pitch > 0
+        // Tête qui tombe vers l'avant (pitch positif) = signe principal de fatigue
+        val headFallingForward = pitch > pitchThreshold
         
-        // Tête inclinée sur le côté (roll) = signe de fatigue
+        // Tête inclinée sur le côté (roll) = signe de fatigue seulement si très inclinée
         val headTiltedSideways = kotlin.math.abs(roll) > rollThreshold
         
-        // Rotation excessive (yaw) peut aussi indiquer de la fatigue
-        val headRotated = kotlin.math.abs(yaw) > yawThreshold
+        // Rotation (yaw) n'est PAS un signe de fatigue - c'est normal de tourner la tête
+        // On ignore le yaw pour la détection de fatigue
         
-        return headFallingForward || headTiltedSideways || headRotated
+        return headFallingForward || headTiltedSideways
     }
     
     /**

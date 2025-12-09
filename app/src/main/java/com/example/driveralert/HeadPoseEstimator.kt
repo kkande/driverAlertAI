@@ -66,7 +66,7 @@ object HeadPoseEstimator {
             pitch < -20 -> descriptions.add("Tête penchée vers l'arrière")
         }
         
-        when {
+        when {R
             roll > 15 -> descriptions.add("Tête inclinée à droite")
             roll < -15 -> descriptions.add("Tête inclinée à gauche")
         }
